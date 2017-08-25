@@ -27,21 +27,38 @@ const output = document.getElementById("moviesOutput");
 let moviesClickSource = Observable.fromEvent(button,"click");
 
 const load = (url: string) => {
-  let xhr = new XMLHttpRequest();
-  xhr.addEventListener("load", () => {
-    let movies = JSON.parse(xhr.responseText);
-    movies.movies.forEach(movie => {
-      let div = document.createElement("div");
-      div.innerHTML = movie.title;
-      output.appendChild(div);
+  return Observable.create(observer => {
+    let xhr = new XMLHttpRequest();
+
+    xhr.addEventListener("load", () => {
+      let data = JSON.parse(xhr.responseText);
+      observer.next(data);
+      observer.complete();
     });
+
+    xhr.open("GET", url);
+    xhr.send();
   });
-  xhr.open("GET", url);
-  xhr.send();
 };
 
-moviesClickSource.subscribe(
-  e => load("movies.json"),
+const renderMovies = (data) => {
+  data.movies.forEach(movie => {
+    let div = document.createElement("div");
+    div.innerHTML = movie.title;
+    output.appendChild(div);
+  });
+};
+
+//flatmap => klo ada observerable yg balikin observer langsung di subscribe di next action nya, kek semacam !(di swift) buat nge extract value dari not null
+moviesClickSource.flatMap(e => load('movies.json'))
+  .subscribe(o => console.log(o));
+
+load("movies.json");  //this will not load json until you subscribe it !
+
+moviesClickSource
+  .flatMap(e => load("movies.json"))
+  .subscribe(
+    renderMovies,
   error => console.log(`error : ${error}`),
   () => console.log('complete !')
 );
