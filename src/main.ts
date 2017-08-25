@@ -31,14 +31,18 @@ const load = (url: string) => {
     let xhr = new XMLHttpRequest();
 
     xhr.addEventListener("load", () => {
-      let data = JSON.parse(xhr.responseText);
-      observer.next(data);
-      observer.complete();
+      if(xhr.status === 200) {
+        let data = JSON.parse(xhr.responseText);
+        observer.next(data);
+        observer.complete();
+      }else{
+        observer.error(xhr.status);
+      }
     });
 
     xhr.open("GET", url);
     xhr.send();
-  });
+  }).retry(3);
 };
 
 const renderMovies = (data) => {
@@ -49,14 +53,8 @@ const renderMovies = (data) => {
   });
 };
 
-//flatmap => klo ada observerable yg balikin observer langsung di subscribe di next action nya, kek semacam !(di swift) buat nge extract value dari not null
-moviesClickSource.flatMap(e => load('movies.json'))
-  .subscribe(o => console.log(o));
-
-load("movies.json");  //this will not load json until you subscribe it !
-
 moviesClickSource
-  .flatMap(e => load("movies.json"))
+  .flatMap(e => load("moviess.json"))
   .subscribe(
     renderMovies,
   error => console.log(`error : ${error}`),
