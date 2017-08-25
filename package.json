@@ -5,17 +5,17 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "start" : "webpack-dev-server --watch --inline",
+    "start": "webpack-dev-server --watch --inline",
     "postinstall": "typings install"
   },
   "dependencies": {
     "rxjs": "^5.4.2"
   },
   "devDependencies": {
-    "ts-loader": "^2.3.2",
+    "ts-loader": "^2.3.3",
     "typescript": "^2.4.2",
     "typings": "^2.1.1",
-    "webpack": "^3.5.1",
-    "webpack-dev-server": "^2.7.0"
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.7.1"
   }
 }
