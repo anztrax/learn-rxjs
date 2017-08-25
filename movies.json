@@ -1,0 +1,7 @@
+{
+  "movies" : [
+    {"title" : "star wars"},
+    {"title" : "start trek" },
+    {"title" : "cars 3"}
+  ]
+}

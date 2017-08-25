@@ -1,65 +1,47 @@
-import {Observable, Observer } from "rxjs";
-// import {Observable} from "rxjs/Observable";
-// import "rxjs/add/observable/from";
-// import "rxjs/add/operator/map";
-// import "rxjs/add/operator/filter";
-// import {Observer} from "rxjs/Observer";
+import {Observable } from "rxjs";
 
-//observable
-let numbers = [1, 5, 10];
-let source = Observable.from(numbers);
-let sourceWithErrorTriggered = Observable.create(observer => {
-  for(let n of numbers){
-    if(n === 5){
-      observer.error("Something went wrong !");
-    }
-    observer.next(n);
+const circle = document.getElementById("circle");
+let source = Observable.fromEvent(document,"mousemove").map((e: MouseEvent) => {
+  return {
+    x : e.clientX,
+    y : e.clientY
   }
-  observer.complete();
-});
+}).filter(value => value.x < 500 && value.y < 200)
+  .delay(100);
 
-let sourceWithTimeout = Observable.create(observer => {
-  let index = 0;
-  let produceValue = () => {
-    observer.next(numbers[index++]);
 
-    if(index < numbers.length){
-      setTimeout(produceValue,200);
-    }else{
-      observer.complete();
-    }
-  };
-
-  produceValue();
-}).map(n => n * 2)
-  .filter(n => n > 4);
-
-//observer
-sourceWithTimeout.subscribe(
-  value => console.log(`value : ${value}`),
-  error => console.log(`error : ${error}`),
-  () => console.log('complete with simple function !')
-);
+const onNext = (value) => {
+  circle.style.left = `${value.x}px`;
+  circle.style.top = `${value.y}px`;
+};
 
 source.subscribe(
-  value => console.log(`value : ${value}`),
+  onNext,
   error => console.log(`error : ${error}`),
   () => console.log('complete with simple function !')
 );
 
-//interface that back Number values
-class MyObserver implements Observer<Number>{
-  next(value){
-    console.log(`value : ${value}`);
-  }
 
-  error(e){
-    console.error(`error : ${e}`);
-  }
+const button = document.getElementById("getMoviesBtn");
+const output = document.getElementById("moviesOutput");
+let moviesClickSource = Observable.fromEvent(button,"click");
 
-  complete(){
-    console.log("complete");
-  }
-}
-source.subscribe(new MyObserver());
-sourceWithErrorTriggered.subscribe(new MyObserver());
+const load = (url: string) => {
+  let xhr = new XMLHttpRequest();
+  xhr.addEventListener("load", () => {
+    let movies = JSON.parse(xhr.responseText);
+    movies.movies.forEach(movie => {
+      let div = document.createElement("div");
+      div.innerHTML = movie.title;
+      output.appendChild(div);
+    });
+  });
+  xhr.open("GET", url);
+  xhr.send();
+};
+
+moviesClickSource.subscribe(
+  e => load("movies.json"),
+  error => console.log(`error : ${error}`),
+  () => console.log('complete !')
+);
