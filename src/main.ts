@@ -42,7 +42,19 @@ const load = (url: string) => {
 
     xhr.open("GET", url);
     xhr.send();
-  }).retry(3);
+  }).retryWhen(retryStrategy({attempts: 3, delay : 1500}));
+};
+
+const retryStrategy = ({attempts = 4, delay = 1000}) => {
+  return (errors) => {
+    return errors
+      .scan((accumulator, value) => {
+        console.log(accumulator, value);
+        return accumulator + 1;
+      }, 0)
+      .takeWhile(accumulator => accumulator < attempts)
+      .delay(delay);
+  }
 };
 
 const renderMovies = (data) => {
