@@ -35,7 +35,7 @@ const renderMovies = (data) => {
   });
 };
 
-loadWithFetch("moviess.json");
+// loadWithFetch("moviess.json");
 
 moviesClickSource
   .flatMap(e => loadWithFetch("moviess.json"))
