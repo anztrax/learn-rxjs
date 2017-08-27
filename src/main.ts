@@ -45,6 +45,13 @@ const load = (url: string) => {
   }).retryWhen(retryStrategy({attempts: 3, delay : 1500}));
 };
 
+const loadWithFetch = (url: string) => {
+  //Observable.fromPromise() is not lazy so we need to DEFER it !
+  return Observable.defer(() => {
+    return Observable.fromPromise(fetch(url).then(r => r.json()));
+  });
+};
+
 const retryStrategy = ({attempts = 4, delay = 1000}) => {
   return (errors) => {
     return errors
@@ -65,8 +72,10 @@ const renderMovies = (data) => {
   });
 };
 
+loadWithFetch("movies.json");
+
 moviesClickSource
-  .flatMap(e => load("moviess.json"))
+  .flatMap(e => loadWithFetch("movies.json"))
   .subscribe(
     renderMovies,
   error => console.log(`error : ${error}`),
