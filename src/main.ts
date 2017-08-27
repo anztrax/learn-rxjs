@@ -35,10 +35,17 @@ const renderMovies = (data) => {
   });
 };
 
-// loadWithFetch("moviess.json");
+let subscription = load("moviess.json").subscribe(
+  renderMovies,
+  e => console.log(`e : ${e}`),
+  () => console.log('complete !')
+);
+console.log(subscription);
+subscription.unsubscribe();
+
 
 moviesClickSource
-  .flatMap(e => loadWithFetch("moviess.json"))
+  .flatMap(e => loadWithFetch("movies.json"))
   .subscribe(
     renderMovies,
     error => console.log(`error : ${error}`),
