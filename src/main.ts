@@ -10,12 +10,15 @@ let source = Observable.create((observer) => {
 });
 
 //NOTE : when error occurred when
-let mergedSource = Observable.onErrorResumeNext(
+let mergedSource = Observable.merge(
   Observable.of(1),
   Observable.from([2,3,4]),
   Observable.throw(new Error("Stop !")),
   Observable.of(5)
-);
+).catch(e => {
+  console.log(`caught : ${e}`);
+  return Observable.of(10);
+});
 
 
 
