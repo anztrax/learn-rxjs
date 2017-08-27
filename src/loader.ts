@@ -22,7 +22,16 @@ const load = (url: string) => {
 const loadWithFetch = (url: string) => {
   //Observable.fromPromise() is not lazy so we need to DEFER it !
   return Observable.defer(() => {
-    return Observable.fromPromise(fetch(url).then(r => r.json()));
+    return Observable.fromPromise(
+      fetch(url).then(r => {
+        if (r.status === 200) {
+          return r.json();
+        }else{
+          //if something is wrong reject the promise !
+          return Promise.reject(r);
+        }
+      })
+    ).retryWhen(retryStrategy({attempts : 4, delay : 1000}));
   });
 };
 
