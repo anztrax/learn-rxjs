@@ -10,7 +10,7 @@ let source = Observable.create((observer) => {
 });
 
 //NOTE : when error occurred when
-let mergedSource = Observable.merge(
+let mergedSource = Observable.onErrorResumeNext(
   Observable.of(1),
   Observable.from([2,3,4]),
   Observable.throw(new Error("Stop !")),
